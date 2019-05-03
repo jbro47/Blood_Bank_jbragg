@@ -1,0 +1,166 @@
+#Persons table with primary key as pid, all people that are either patients or donors
+CREATE TABLE persons (
+pid char(8) not null unique,
+first_name text not null,
+last_name text not null,
+age integer not null,
+primary key(pid)
+);
+
+#Popilating tables with PID, First Name, Last Name, and age
+insert into persons values('p1', 'John', 'Centra', '23');
+insert into persons values('p2', 'Anne', 'Parker', '42');
+insert into persons values('p3', 'Ryan', 'Fowler', '32');
+insert into persons values('p4', 'Peter', 'Cruz', '21');
+insert into persons values('p5', 'Stanphanie', 'Collins', '46'); 
+insert into persons values('p6', 'Harry', 'Bryant', '62');
+insert into persons values('p7', 'James', 'Bond', '40');
+insert into persons values('p8', 'David', 'King', '34');
+insert into persons values('p9', 'Thomas', 'Tank', '24');
+insert into persons values('p10', 'Jessica', 'Roberts', '42');
+insert into persons values('p11', 'Carol', 'Porter', '62');
+insert into persons values('p12', 'Emily', 'Murphy', '21');
+insert into persons values('p13', 'Mathew', 'McDerm', '37');
+insert into persons values('p14', 'Joesph', 'Ruggiero', '19');
+insert into persons values('p15', 'Hannah', 'Taylor', '17');
+insert into persons values('p16', 'Anne', 'Miller', '48');
+insert into persons values('p17', 'Caroline', 'Powers', '38');
+insert into persons values('p18', 'Emily', 'McFelice', '40');
+insert into persons values('p19', 'Patricia', 'Wilson', '39');
+insert into persons values('p20', 'Bill', 'Bowerman', '26');
+insert into persons values('p21', 'Mickey', 'Globe', '23');
+
+#Donor table with primary key and foreign key as pid, people that donate blood
+CREATE TABLE donor (
+pid char(8) not null references persons(pid),
+blood_type char(3) not null,
+weightLBS integer not null,
+heightIN integer not null,
+gender char(1) not null,
+primary key(pid)
+);
+
+#Populates tables with pid, bloodtype, weight, height, and gender
+insert into donor values('p4', 'O+', '149', '70', 'M');
+insert into donor values('p7', 'O-', '170', '74', 'M');
+insert into donor values('p8', 'AB-', '148', '66', 'M');
+insert into donor values('p9', 'B-', '180', '71', 'M');
+insert into donor values('p13', 'O+', '212', '76', 'M');
+insert into donor values('p14', 'B+', '128', '68', 'M');
+insert into donor values('p15', 'O+', '104', '63', 'F');
+insert into donor values('p20', 'A+', '178', '65', 'M');
+insert into donor values('p21', 'AB+', '120', '57', 'F');
+
+#Patient table with foreign key and primary key as pid, people who need transfusions
+CREATE TABLE patient (
+pid char(8) not null references persons(pid),
+blood_type char(3) not null,
+need_status text not null,
+weightLBS integer not null,
+CONSTRAINT check_status CHECK (need_status = 'high' OR need_status = 'low'),
+primary key(pid)
+);
+
+#Populate tables with pid, bloodtyep, priority of transfusion, weight
+insert into patient value('p1', 'O+', 'low', '172');
+insert into patient value('p3', 'A+', 'low', '185');
+insert into patient value('p6', 'AB+', 'high', '128');
+insert into patient value('p11', 'B+', 'low', '120’);
+insert into patient value('p12', 'A+', 'low', '118');
+
+#Nurse table with pid as primary key and foreign key, nurse who help persons
+CREATE TABLE nurse (
+pid char(8) not null references persons(pid),
+years_experienced integer not null,
+primary key(pid)
+);
+
+#Populate tables with pid and years of experience
+insert into nurse value('p2', '12');
+insert into nurse value('p4', '17');
+insert into nurse value('p10', '5');
+insert into nurse value('p16', '18');
+insert into nurse value('p17', '9');
+insert into nurse value('p18', '10');
+insert into nurse value('p19', '12');
+
+#Pre_exam table with primary key as peid
+CREATE TABLE pre_exam (
+peid char(8) not null,
+hemoglobin_gDL decimal(5,2) not null,
+temperature_F decimal(5,2) not null,
+blood_pressure char(8) not null,
+pulse_rate_BPM integer not null,
+primary key(peid)
+);
+
+#Populate table peid, hemoglobin level, temperature, blood pressure, and pulse rate
+insert into pre_exam value('pe1', '15.2', '98.6', '120/80', '70');
+insert into pre_exam value('pe2', '14.9', '98.5', '110/70', '75');
+insert into pre_exam value('pe3', '15.7', '98.5', '130/85', '59');
+insert into pre_exam value('pe4', '16.1', '98.4', '120/80', '67');
+insert into pre_exam value('pe5', '14.2', '98.3', '90/80', '90');
+insert into pre_exam value('pe6', '17.1', '98.2', '110/70', '44');
+insert into pre_exam value('pe7', '14.2', '98.1', '140/90', '79');
+insert into pre_exam value('pe8', '7.1', '98.9', '90/60', '76');
+insert into pre_exam value('pe9', '8', '98.6', '130/85', '80');
+insert into pre_exam value('pe10', '7.9', '98.7', '120/80', '82');
+
+#Donation table with did as primary key, pid, peid, and nurse as foreign key
+CREATE TABLE donation (
+did char(8) not null,
+pid char(8) not null references donor(pid),
+peid char(8) not null references pre_exam(peid),
+nurse char(8) not null references nurse(pid),
+amount_donated_CC decimal(5,2) not null,
+donation_type text not null references donation_types(type),
+primary key(did)
+);
+
+#Populate tables with did, pid, peid, nurse, CCs donated, donation type
+insert into donation value('d1', 'p4', 'pe1', 'p16', '946', 'Power Red');
+insert into donation value('d2', 'p7', 'pe2', 'p17', '473', 'Blood');
+insert into donation value('d3', 'p8', 'pe3', 'p18', '473', 'Plasma');
+insert into donation value('d4', 'p9', 'pe4', 'p19', '473', 'Blood');
+insert into donation value('d5', 'p13', 'pe5', 'p16', '473', 'Platelets');
+insert into donation value('d6', 'p14', 'pe6', 'p16', '473', 'Blood');
+insert into donation value('d7', 'p15', 'pe7', 'p16', '473', 'Blood');
+insert into donation value('d8', 'p4', 'pe13', 'p16', '473', 'Blood');
+insert into donation value('d9', 'p14', 'pe14', 'p16', '473', 'Blood');
+insert into donation value('d10', 'p20', 'pe15', 'p17', '473', 'Blood');
+
+#Transfusion table with primary key as tid, foreign keys are pid, peid, and nurse
+CREATE TABLE transfusion (
+tid char(8) not null,
+pid char(8) not null references patient(pid),
+peid char(8) not null references pre_exam(peid),
+nurse char(8) not null references nurse(pid),
+amount_recieved_CC decimal(5,2) not null,
+primary key(tid)
+);
+
+#Populate tables with tid, pid, peid, nurse, amount of blood recieved
+insert into transfusion value('t1', 'p1', 'pe8', 'p2', '473');  
+insert into transfusion value('t2', 'p3', 'pe9', 'p4', '946');
+insert into transfusion value('t3', 'p6', 'pe10', 'p2', '473');
+insert into transfusion value('t4', 'p11', 'pe11', 'p10', '716');
+insert into transfusion value('t5', 'p12', 'pe12', 'p4', '473');
+
+#Possible querries
+
+#Returns all of the patients first and last names that are on high priority for blood
+SELECT p.pid, 
+p.first_name, 
+p.last_name 
+FROM persons p INNER JOIN patient pa ON p.pid = pa.pid 
+WHERE pa.need_status = 'high';
+
+#Returns that amount of times each person has donated and the amount of blood that they have donated in descending order
+SELECT p.pid,
+p.first_name,
+p.last_name,
+COUNT(d.pid) AS TimesDonated,
+SUM(d.amount_donated_CC) AS TotalAmount
+FROM persons p INNER JOIN donation d ON p.pid = d.pid
+GROUP BY p.pid
+ORDER by TotalAmount desc;
